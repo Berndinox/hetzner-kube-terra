@@ -289,7 +289,7 @@ provider "hcloud" {
   token = var.hcloud_token
 }
 output "kubeconfig" {
-  value = module.kube-hetzner.kubeconfig
+  value = module.kube-hetzner.kubeconfig_external
   sensitive = true
 }
 
