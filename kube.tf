@@ -289,7 +289,7 @@ provider "hcloud" {
   token = var.hcloud_token
 }
 output "kubeconfig" {
-  value = kubeconfig_file
+  value = local.kubeconfig_file
   description = "Kubeconfig file content with external IP address"
 }
 terraform {
