@@ -289,7 +289,7 @@ provider "hcloud" {
   token = var.hcloud_token
 }
 output "kubeconfig" {
-  value = kubeconfig
+  value = remote_file.kubeconfig
 }
 terraform {
   required_version = ">= 1.2.0"
