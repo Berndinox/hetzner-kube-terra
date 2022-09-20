@@ -290,6 +290,7 @@ provider "hcloud" {
 }
 output "kubeconfig" {
   value = module.kube-hetzner.kubeconfig
+  sensitive = true
 }
 
 terraform {
