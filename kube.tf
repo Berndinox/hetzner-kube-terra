@@ -1,10 +1,10 @@
 variable "hcloud_token" {
   type = string
 }
-variable "sh_public_key" {
+variable "ssh_public_key" {
   type = string
 }
-variable "sh_private_key" {
+variable "ssh_private_key" {
   type = string
 }
 
