@@ -288,10 +288,6 @@ module "kube-hetzner" {
 provider "hcloud" {
   token = var.hcloud_token
 }
-output "kubeconfig" {
-  value = local.kubeconfig_file
-  description = "Kubeconfig file content with external IP address"
-}
 terraform {
   required_version = ">= 1.2.0"
   required_providers {
