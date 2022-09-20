@@ -288,6 +288,10 @@ module "kube-hetzner" {
 provider "hcloud" {
   token = var.hcloud_token
 }
+output "kubeconfig" {
+  value = module.kube-hetzner.kubeconfig
+}
+
 terraform {
   required_version = ">= 1.2.0"
   required_providers {
