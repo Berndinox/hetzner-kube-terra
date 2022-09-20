@@ -289,7 +289,8 @@ provider "hcloud" {
   token = var.hcloud_token
 }
 output "kubeconfig" {
-  value = one(module.kube-hetzner.data.remote_file.kubeconfig)
+  value = kubeconfig_file
+  description = "Kubeconfig file content with external IP address"
 }
 terraform {
   required_version = ">= 1.2.0"
