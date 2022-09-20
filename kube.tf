@@ -1,13 +1,18 @@
-locals {
-  # Fill first and foremost your Hetzner API token, found in your project, Security, API Token, of type Read & Write.
-  hcloud_token = "xxxxxxxxxxxxxxxxYYYYYYYYYYzzzzzzzzzzzzzzzzz"
+variable "hcloud_token" {
+  type = string
+}
+variable "sh_public_key" {
+  type = string
+}
+variable "sh_private_key" {
+  type = string
 }
 
 module "kube-hetzner" {
   providers = {
     hcloud = hcloud
   }
-  hcloud_token = local.hcloud_token
+  hcloud_token = var.hcloud_token
 
   # Then fill or edit the below values. Only the first values starting with a * are obligatory; the rest can remain with their default values, or you
   # could adapt them to your needs.
@@ -85,9 +90,9 @@ module "kube-hetzner" {
       count       = 1
     },
     {
-      name        = "control-plane-hel1",
+      name        = "control-plane-nbg2",
       server_type = "cpx11",
-      location    = "hel1",
+      location    = "nbg1",
       labels      = [],
       taints      = [],
       count       = 1
@@ -96,33 +101,14 @@ module "kube-hetzner" {
 
   agent_nodepools = [
     {
-      name        = "agent-small",
-      server_type = "cpx11",
-      location    = "fsn1",
-      labels      = [],
-      taints      = [],
-      count       = 1
-    },
-    {
-      name        = "agent-large",
+      name        = "main",
       server_type = "cpx21",
       location    = "nbg1",
-      labels      = [],
-      taints      = [],
-      count       = 1
-    },
-    {
-      name        = "storage",
-      server_type = "cpx21",
-      location    = "fsn1",
       # Fully optional, just a demo
       labels = [
         "node.kubernetes.io/server-usage=storage"
       ],
-      taints = [
-        "server-usage=storage:NoSchedule"
-      ],
-      count = 1
+      count = 2
       # In the case of using Longhorn, you can use Hetzner volumes instead of using the node's own storage by specifying a value from 10 to 10000 (in GB)
       # It will create one volume per node in the nodepool, and configure Longhorn to use them.
       # longhorn_volume_size = 20
@@ -131,7 +117,7 @@ module "kube-hetzner" {
 
   # * LB location and type, the latter will depend on how much load you want it to handle, see https://www.hetzner.com/cloud/load-balancer
   load_balancer_type     = "lb11"
-  load_balancer_location = "fsn1"
+  load_balancer_location = "nbg1"
 
   ### The following values are entirely optional (and can be removed from this if unused)
 
@@ -139,13 +125,13 @@ module "kube-hetzner" {
   # base_domain = "mycluster.example.com"
 
   # To use local storage on the nodes, you can enable Longhorn, default is "false".
-  # enable_longhorn = true
+  enable_longhorn = true
 
   # The file system type for Longhorn, if enabled (ext4 is the default, otherwise you can choose xfs)
   # longhorn_fstype = "xfs"
 
   # how many replica volumes should longhorn create (default is 3)
-  # longhorn_replica_count = 1
+  longhorn_replica_count = 2
 
   # When you enable Longhorn, you can go with the default settings and just modify the above two variables OR you can copy the longhorn_values.yaml.example
   # file to longhorn_value.yaml and put it at the base of your own module, next to your kube.tf, this is Longhorn's own helm values file. 
@@ -172,10 +158,10 @@ module "kube-hetzner" {
   # we allow you to add a nginx_ingress_values.yaml file to the root of your module, next to the kube.tf file, it is simply a helm values config file.
   # See the nginx_ingress_values.yaml.example located at the root of this project.
   # After the cluster is deployed, you can always use HelmChartConfig definition to tweak the configuration.
-  # enable_nginx = true
+  enable_nginx = false
 
   # If you want to disable the Traefik ingress controller, to use the Nginx ingress controller for instance, you can can set this to "false". Default is "true".
-  # enable_traefik = false
+  enable_traefik = false
   
   # Use the klipper LB, instead of the default Hetzner one, that has an advantage of dropping the cost of the setup,
   # Automatically "true" in the case of single node cluster.
@@ -241,7 +227,7 @@ module "kube-hetzner" {
   # CAVEATS: Calico is not supported when not using the Hetzner LB (like when enable_klipper_metal_lb is set to true or when using a single node cluster),
   # because of the following issue https://github.com/k3s-io/klipper-lb/issues/6.
   # As for Cilium, we allow infinite configurations, please check the CNI section of the readme over at https://github.com/kube-hetzner/terraform-hcloud-kube-hetzner/#cni.
-  # cni_plugin = "cilium"
+  cni_plugin = "cilium"
 
   # If you want to disable the k3s default network policy controller, use this flag!
   # Both Calico and Ciliun cni_plugin values override this value to true automatically, the default is "false".
@@ -263,7 +249,7 @@ module "kube-hetzner" {
 
   # When this is enabled, rather than the first node, all external traffic will be routed via a control-plane loadbalancer, allowing for high availability.
   # The default is false.
-  # use_control_plane_lb = true
+  use_control_plane_lb = true
 
   # You can enable Rancher (installed by Helm behind the scenes) with the following flag, the default is "false".
   # When Rancher is enabled, it automatically installs cert-manager too, and it uses rancher's own self-signed certificates.
@@ -299,7 +285,7 @@ module "kube-hetzner" {
 }
 
 provider "hcloud" {
-  token = local.hcloud_token
+  token = var.hcloud_token
 }
 
 terraform {
