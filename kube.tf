@@ -288,7 +288,7 @@ module "kube-hetzner" {
 provider "hcloud" {
   token = var.hcloud_token
 }
-output "kubeconfig" {
+output "kubeconfig_external" {
   value = module.kube-hetzner.kubeconfig_external
   sensitive = true
 }
