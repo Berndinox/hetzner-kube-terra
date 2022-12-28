@@ -24,7 +24,7 @@ module "kube-hetzner" {
   # you can optionally specify a version number
   # version = "1.2.0"
 
-  # Note that some values, notably "location" and "public_key" have no effect after initializing the cluster.
+  # Note that some values, notably "location" and "public_key" have no effect after initializing the.
   # This is to keep Terraform from re-provisioning all nodes at once, which would lose data. If you want to update
   # those, you should instead change the value here and manually re-provision each node. Grep for "lifecycle".
 
@@ -126,7 +126,7 @@ module "kube-hetzner" {
   ### The following values are entirely optional (and can be removed from this if unused)
 
   # You can refine a base domain name to be use in this form of nodename.base_domain for setting the reserve dns inside Hetzner
-  # base_domain = "mycluster.example.com"
+  base_domain = "k8s.berndklaus.cloud"
 
   # To use local storage on the nodes, you can enable Longhorn, default is "false".
   enable_longhorn = false
@@ -304,6 +304,6 @@ terraform {
 
 output "kubeconfig" {
   value     = module.kube-hetzner.kubeconfig
-  sensitive = false
+  sensitive = true
 }
   
