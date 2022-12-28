@@ -99,20 +99,14 @@ module "kube-hetzner" {
     }
   ]
 
-  agent_nodepools = [
+  autoscaler_nodepools = [
     {
-      name        = "main",
+      name        = "pool-nbg-1",
       server_type = "cpx21",
       location    = "nbg1",
-      # Fully optional, just a demo
-      labels = [
-        "node.kubernetes.io/server-usage=storage"
-      ],
       taints = [],
-      count = 2
-      # In the case of using Longhorn, you can use Hetzner volumes instead of using the node's own storage by specifying a value from 10 to 10000 (in GB)
-      # It will create one volume per node in the nodepool, and configure Longhorn to use them.
-      # longhorn_volume_size = 20
+      min_nodes   = 2
+      max_nodes   = 4
     }
   ]
 
@@ -126,13 +120,13 @@ module "kube-hetzner" {
   # base_domain = "mycluster.example.com"
 
   # To use local storage on the nodes, you can enable Longhorn, default is "false".
-  enable_longhorn = true
+  enable_longhorn = false
 
   # The file system type for Longhorn, if enabled (ext4 is the default, otherwise you can choose xfs)
   # longhorn_fstype = "xfs"
 
   # how many replica volumes should longhorn create (default is 3)
-  longhorn_replica_count = 2
+  # longhorn_replica_count = 2
 
   # When you enable Longhorn, you can go with the default settings and just modify the above two variables OR you can copy the longhorn_values.yaml.example
   # file to longhorn_value.yaml and put it at the base of your own module, next to your kube.tf, this is Longhorn's own helm values file. 
@@ -159,7 +153,7 @@ module "kube-hetzner" {
   # we allow you to add a nginx_ingress_values.yaml file to the root of your module, next to the kube.tf file, it is simply a helm values config file.
   # See the nginx_ingress_values.yaml.example located at the root of this project.
   # After the cluster is deployed, you can always use HelmChartConfig definition to tweak the configuration.
-  enable_nginx = false
+  enable_nginx = true
 
   # If you want to disable the Traefik ingress controller, to use the Nginx ingress controller for instance, you can can set this to "false". Default is "true".
   enable_traefik = false
@@ -181,7 +175,7 @@ module "kube-hetzner" {
   # traefik_additional_options = []
 
   # If you want to disable the metric server, you can! Default is "true".
-  # enable_metrics_server = false
+  enable_metrics_server = true
 
   # If you want to allow non-control-plane workloads to run on the control-plane nodes, set "true" below. The default is "false".
   # True by default for single node clusters.
@@ -197,14 +191,14 @@ module "kube-hetzner" {
   # initial_k3s_channel = "latest"
 
   # The cluster name, by default "k3s"
-  # cluster_name = ""
+  cluster_name = "k8s"
 
   # Whether to use the cluster name in the node name, in the form of {cluster_name}-{nodepool_name}, the default is "true".
   # use_cluster_name_in_node_name = false
 
   # Adding extra firewall rules, like opening a port
   # More info on the format here https://registry.terraform.io/providers/hetznercloud/hcloud/latest/docs/resources/firewall
-  # extra_firewall_rules = [
+  extra_firewall_rules = [
   #   # For Postgres
   #   {
   #     direction       = "in"
@@ -214,14 +208,14 @@ module "kube-hetzner" {
   #     destination_ips = [] # Won't be used for this rule 
   #   },
   #   # To Allow ArgoCD access to resources via SSH
-  #   {
-  #     direction       = "out"
-  #     protocol        = "tcp"
-  #     port            = "22"
-  #     source_ips      = [] # Won't be used for this rule 
-  #     destination_ips = ["0.0.0.0/0", "::/0"]
-  #   }
-  # ]
+    {
+      direction       = "out"
+      protocol        = "tcp"
+      port            = "22"
+      source_ips      = [] # Won't be used for this rule 
+      destination_ips = ["0.0.0.0/0", "::/0"]
+    }
+  ]
 
   # If you want to configure a different CNI for k3s, use this flag
   # possible values: flannel (Default), calico, and cilium
@@ -242,7 +236,7 @@ module "kube-hetzner" {
   # block_icmp_ping_in = true
 
   # You can enable cert-manager (installed by Helm behind the scenes) with the following flag, the default is "false".
-  # enable_cert_manager = true
+  enable_cert_manager = true
 
   # IP Addresses to use for the DNS Servers, set to an empty list to use the ones provided by Hetzner, defaults to ["1.1.1.1", " 1.0.0.1", "8.8.8.8"].
   # For rancher installs, best to leave it as default.
@@ -290,13 +284,17 @@ provider "hcloud" {
 }
 
 terraform {
-  required_version = ">= 1.2.0"
+  required_version = ">= 1.3.3"
   required_providers {
     hcloud = {
       source  = "hetznercloud/hcloud"
-      version = ">= 1.35.1"
+      version = ">= 1.35.2"
     }
   }
 }
 
+output "kubeconfig" {
+  value     = module.kube-hetzner.kubeconfig
+  sensitive = false
+}
   
