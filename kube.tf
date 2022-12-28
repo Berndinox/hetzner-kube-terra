@@ -77,7 +77,7 @@ module "kube-hetzner" {
       name        = "control-plane-fsn1",
       server_type = "cpx11",
       location    = "fsn1",
-      labels      = [],
+      labels      = [node.kubernetes.io/exclude-from-external-load-balancers: "true"],
       taints      = [],
       count       = 1
     },
@@ -85,7 +85,7 @@ module "kube-hetzner" {
       name        = "control-plane-nbg1",
       server_type = "cpx11",
       location    = "nbg1",
-      labels      = [],
+      labels      = [node.kubernetes.io/exclude-from-external-load-balancers: "true"],
       taints      = [],
       count       = 1
     },
@@ -93,7 +93,7 @@ module "kube-hetzner" {
       name        = "control-plane-nbg2",
       server_type = "cpx11",
       location    = "nbg1",
-      labels      = [],
+      labels      = [node.kubernetes.io/exclude-from-external-load-balancers: "true"],
       taints      = [],
       count       = 1
     }
