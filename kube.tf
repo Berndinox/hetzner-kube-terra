@@ -98,15 +98,15 @@ module "kube-hetzner" {
       count       = 1
     }
   ]
-
+  agent_nodepools = []
   autoscaler_nodepools = [
     {
-      name        = "pool-nbg-1",
+      name        = "autoscale-nbg-1",
       server_type = "cpx21",
       location    = "nbg1",
       taints = [],
-      min_nodes   = 2
-      max_nodes   = 4
+      min_nodes   = 1
+      max_nodes   = 3
     }
   ]
 
